@@ -1,0 +1,42 @@
+//This Code Example is for a programming course focused on connecting to and utilizing a SQL Server
+//Written by Victoria McKenney, in C#
+
+using System;
+using System.Text;
+using System.Data.SqlClient;
+namespace SqlServerSample
+{
+    class Program{
+        static void Main(string[] args){
+            try  //Using try catch in case of any errors
+            {
+                // Build connection string 
+                SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder();
+                builder.DataSource = "cop2664spring21.database.windows.net";   
+                builder.UserID = "rasm_user";      
+                builder.Password = "Password";       
+                builder.InitialCatalog = "COP2664spring2021";  
+                // Connect to SQL 
+                Console.Write("Connecting to SQL Server");
+                using (SqlConnection connect = new SqlConnection(builder.ConnectionString)){
+                    connect.Open();
+                    Console.WriteLine("Connected.");
+                    // READ
+                    Console.WriteLine("Reading data from table, press any key to continue");
+                    Console.ReadKey(true);
+                    String sql = "USE [dbo].[Persons];";
+                    StringBuilder sb = new StringBuilder();
+                    sb.Clear();
+                    // This tells the console what SELECT statement to execute. 
+                    sql = "SELECT FirstName, LastName, Address, City FROM [dbo].[Persons];";
+                    using (SqlCommand command = new SqlCommand(sql, connect)){
+                        using (SqlDataReader reader = command.ExecuteReader()){
+                            while (reader.Read()){
+                                //prints results of query
+                                Console.WriteLine("{0} {1} {2} {3}", reader.GetString(0), reader.GetString(1), reader.GetString(2), reader.GetString(3));
+                            }}}}}
+            catch (SqlException e){
+                Console.WriteLine(e.ToString());}
+            //Holding program open to view
+            Console.ReadKey(true);
+        }}}
