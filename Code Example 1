@@ -1,0 +1,153 @@
+//This Code Example is for a programming course focused on learning utilization of the file reader and writer.
+
+package cop4970;  //Package titled after course number.
+
+import java.io.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Scanner;
+
+public class module05 { 
+	public static void main(String args[]) {
+    		//initialization
+		Scanner scan = new Scanner(System.in);  //Initialize Scanner
+		int choice = -1;  //Initalize menu choice variable
+
+   		//Menu with choice selection for repeatable selections.
+		while(choice != 5) {  //Until user prompts to quit, repeat menu selections
+			System.out.println("Module 05 Menu");  //Menu Options
+			System.out.println("Select one of the following options:");
+			System.out.println("Enter '1' for Data Entry");
+			System.out.println("Enter '2' for Data Sorting");
+			System.out.println("Enter '3' for Print Data");
+			System.out.println("Enter '4' to Delete Data");
+			System.out.println("Enter '5' to Quit");
+			choice = scan.nextInt();  //Read int
+			scan.nextLine();  //Clear line for scanner
+			switch(choice) {  //Switch block to select menu option
+				case 1:
+					//Data Entry section
+					boolean repeating = true;
+					while(repeating) {
+            					//Entering Data
+						System.out.println("Entering Data.");
+						System.out.println("Enter Car Model: ");
+						String model = scan.nextLine();
+						System.out.println("Enter Car Title: ");
+						String title = scan.nextLine();
+						System.out.println("Enter Car Features: ");
+						String features = scan.nextLine();
+						System.out.println("Enter Car Rating Information: ");
+						String rating = scan.nextLine();
+
+            					//Function call
+						dataEntry("Car Model: "+model+"\tCar Title: "+title+"\tCar Features: "+features+"\tCar Rating: "+rating);
+
+            					//Prompt user if they want to continue entering data
+						System.out.println("New data entry? 'q' or 'quit' to stop.");
+						String check = scan.nextLine();  //Enter to text file
+						if(check.equals("q") || check.equals("quit")){  //Repeat until user prompts
+							repeating=false;
+						}
+					}
+					break;
+
+				case 2:
+					//Data sorting
+          				//Try-Catch structure for file reader errors
+					try {
+						BufferedReader reader = new BufferedReader(new FileReader("module05text.txt"));
+						ArrayList<String> textLines = new ArrayList<String>();
+						String currentLine = reader.readLine();
+						while(currentLine != null) {  //Until there is a null line, add entry to arrayList
+							textLines.add(currentLine);
+							currentLine = reader.readLine();
+						}
+						Collections.sort(textLines);
+						BufferedWriter bfWriter = new BufferedWriter(new FileWriter("module05text.txt"));
+						for (String line : textLines) {  //For each line, write to file
+							bfWriter.write(line);
+							bfWriter.newLine();
+						}
+
+						//Close resources
+						bfWriter.close();
+						reader.close();
+						
+					}catch(IOException e) {
+						e.printStackTrace();
+					}
+					break;
+
+				case 3:
+					//Print output
+          				//Try-Catch structure for file reader errors
+					try {
+						BufferedReader reader = new BufferedReader(new FileReader("module05text.txt"));
+						ArrayList<String> textLines = new ArrayList<String>();
+						String currentLine = reader.readLine();
+						while(currentLine != null) {  //Until there is a null line, add to arrayList
+							textLines.add(currentLine);
+							currentLine = reader.readLine();
+						}
+						for(String line : textLines) {  //For each text line, print
+							System.out.println(line);
+						}
+					}catch(IOException e) {
+						e.printStackTrace();
+					}
+					break;
+
+				case 4:
+					//delete all data - will override file with null entry
+          				//Try Catch structure for file reader errors
+					try {
+						FileWriter writer = new FileWriter("Module05text.txt", false);
+						writer.write("");
+						writer.close();
+					}catch (IOException e) {
+						e.printStackTrace();
+					}
+					break;
+
+				case 5:
+					//Quit program
+          				//Switch structure will break, and the Loop for the menu will not repeat due to the selection
+					break;
+
+				default:
+          				//Default cause for invalid menu number selection
+					System.out.println("please enter valid menu option");
+					break;
+			}
+		}	
+	}
+
+  //Data Entry Function
+	public static void dataEntry(String str) {
+    		//Checking if the file exists, and creating a new file if it doesn't.
+    		//Try Catch structure for file reader errors
+		try {
+			File myFile = new File("Module05text.txt");
+			if(myFile.createNewFile()) {
+				System.out.println("File created.");	
+			}else {
+				System.out.println("File exists.");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    		//Writing to the file
+    		//Try Catch structure for file reader errors
+		try {
+			FileWriter myWrite = new FileWriter("Module05text.txt", true);
+			myWrite.write(str+"\r\n");
+			myWrite.close();
+			System.out.println("Wrote to file.");
+		}catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
+}
