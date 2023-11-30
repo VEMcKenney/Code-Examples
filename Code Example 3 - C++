@@ -1,0 +1,222 @@
+//This Code Example is from a programming course, creating a contact list with a vector structure.
+//Written by Victoria McKenney, in C++
+
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <iomanip>
+#include <limits>
+#include <exception>
+#include <vector>
+#include "Contact.h"
+using namespace std;
+
+Contact AddContact() {
+    //This function is to create a Contact Object
+    //Variable declaration
+    string name;
+    string phone;
+    string email;
+
+    //Prompting the user to enter information
+    cout << "Adding contact: " << endl;
+    cout << "Enter the contact's name: " << endl;
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::getline(std::cin, name);
+    cout << "Enter the contact's Phone Number: " << endl;
+    cin >> phone;
+    cout << "Enter the contact's Email: " << endl;
+    cin >> email;
+    //Creating and returning the Object to the user to add to the vector
+    return Contact(name,phone,email);
+}
+
+void BubbleSort(vector<Contact>& vector) {
+    //This function will sort the vector into alphabetical order
+    if (vector.size() == 0) {
+        cout << "No contacts." << endl;
+        return;
+    }
+    bool swapped = true;
+    Contact temp;
+    //This loop will run until no swaps are made - meaning the vector is sorted
+    while (swapped) {
+        swapped = false;
+        //For each position in the vector, it will test to see if the object is smaller than the next object, and if it is, will swap the two. 
+        for (int i = 0; i < vector.size()-1; i++) {
+            if (vector[i].name > vector[i + 1].name) {
+                temp = vector[i];
+                vector[i] = vector[i + 1];
+                vector[i + 1] = temp;
+                swapped = true;
+            }
+        }
+    }
+}
+
+void ViewContact(vector<Contact> vector) {
+    if (vector.size() == 0) {        
+        return;
+    }
+    //Function will display each contact in the vector
+    cout << "Displaying Contact List: " << endl;
+    for (int i = 0; i < vector.size(); i++) {
+        cout << vector[i].toString() << endl;
+    }
+    return;
+}
+
+void SearchContact(vector<Contact> vector) {
+    //Function will prompt the user for a search value
+    //variable declaration
+    string search;
+    bool found = false;
+    cout << "Searching contact list" << endl;
+
+    //user input
+    cout << "Enter name to search for: " << endl;
+    std::cin.clear();
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::getline(std::cin, search);
+    //Searching the entire vector for a match to the search term
+    for (int i = 0; i < vector.size(); i++) {
+        //If found, it will output the contacts information
+        if (vector[i].name == search) {
+            found = true;
+            cout << "Contact found:" << endl;
+            cout << vector[i].toString() << endl;
+            break;
+        }
+    }
+    //If the contact wasn't found, the program will inform the user. 
+    if (found == false) {
+        cout << "Contact not found." << endl;
+    }
+    return;
+}
+
+int main()
+{
+    //Declaring all variables needed for the main function
+    vector<Contact> contactVector;
+    bool loop = true;
+    int choice;
+    int editChoice;
+    string search;
+    bool found = false;
+
+    cout << "This program is a Contact Manager Program." << endl;
+
+    //Menu Looping. 
+    while (loop) {
+        cout << "Main menu.\nOptions: 1 for add a contact, 2 for search contacts, 3 for view all contacts, 4 for edit contact, 5 for exit" << endl;
+        cin >> choice;
+        //Making sure an int is entered for the menu
+        while (std::cin.fail()) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Bad entry. Enter a number: ";
+            cin >> choice;
+        }
+        //Switch to select menu option
+        switch (choice) {
+        case 1:
+            //Calling function to add a contact
+            contactVector.push_back(AddContact());
+            break;
+        case 2:
+            //Calling function to search the vector for a specific contact
+            SearchContact(contactVector);
+            break;
+        case 3:
+            //Sorting the vector
+            BubbleSort(contactVector);
+            //Printing out all contacts in the vector
+            ViewContact(contactVector);
+            break;
+        case 4:
+            //This one is a little more complex. First, it will search the vector to select a contact to edit.
+            cout << "Searching contact list for editing." << endl;
+            cout << "Enter name to search for: " << endl;
+            //Clearing cin inputs to allow for a line of text to be entered.
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::getline(std::cin, search);
+            found = false;
+            //A for loop to search the entire vector
+            for (int i = 0; i < contactVector.size(); i++) {
+                //If the search term matches the name, contact is found
+                if (contactVector[i].name == search) {
+                    found = true;
+                    //Displaying contact
+                    cout << "Contact found:" << endl;
+                    cout << contactVector[i].toString() << endl;
+                    
+                    editChoice = -1;
+                    //Making sure a 1 or a 2 is selected
+                    while (editChoice != 1 && editChoice != 2) {
+                        cout << "Enter 1 to Edit Contact. Enter 2 to Delete Contact" << endl;
+                        cin >> editChoice;
+                        //Protecting program against non-int inputs
+                        while (std::cin.fail()) {
+                            std::cin.clear();
+                            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                            std::cout << "Bad entry. Enter a number: ";
+                            cin >> editChoice;
+                        }
+                    }
+                    //If they want to edit the contact, the user will create a new contact to replace the current entry
+                    if (editChoice == 1) {
+                        cout << "Creating new contact to replace current contact:" << endl;
+                        contactVector[i] = AddContact();
+                    }
+                    //If they want to delete the contact it will be removed from the vector
+                    else if (editChoice == 2) {
+                        cout << "Deleting contact:" << endl;
+                        contactVector.erase(contactVector.begin() + i);
+                    }
+                }
+            }
+            //If the contact isn't found the program will display that to the user. 
+            if (found == false) {
+                cout << "Contact not found." << endl;
+            }
+            break;
+        case 5:
+            //Selecting to quit the program will set the loop to no longer repeat. 
+            loop = false;
+            break;
+        }
+    }
+}
+
+//Contact Class
+#include <string>
+using namespace std;
+class Contact {
+	//Contact Object. Contains personal information
+public:
+	string name;
+	string phone;
+	string email;
+	//Basic constructor without paramters
+	Contact() {
+		name = "";
+		phone = "";
+		email = "";
+	}
+	//Constructor with paramaters
+	Contact(string nameInput, string phoneInput, string emailInput) {
+		name = nameInput;
+		phone = phoneInput;
+		email = emailInput;
+	}
+	//Function to create a string of the object's contents. 
+	string toString() {
+		string str = "Contact's name: " + name + ", Contact's phone: " + phone + ", Contact's Email: " + email;
+		return str;
+	}
+private:
+};
+
